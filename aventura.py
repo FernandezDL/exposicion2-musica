@@ -1,8 +1,13 @@
-# --- Adventure Loop (Mayor) — 98 BPM, 16 compases (~39 s) ---
+# Karen Jimena Hernández Ortega – 21199
+# Diana Lucía Fernández Villatoro – 21747
+# Daniel Esteban Morales Urízar – 21785
+# --- Adventure — 98 BPM, 16 compases (~39 s) ---
+
+
 from music import *
 from random import *
 
-# ---------- Fallbacks de programas GM (por si tu 'music' no trae constantes) ----------
+# ---------- Fallbacks de programas GM  ----------
 GM_PROG_FALLBACK = {
     "STRING_ENSEMBLE_1": 48,
     "HARP": 46,
@@ -15,11 +20,12 @@ GM_PROG_FALLBACK = {
 for name, val in GM_PROG_FALLBACK.items():
     if name not in globals():
         globals()[name] = val
-# Elegir coro disponible
+        
+
 CHOIR = VOICE_OOHS if 'VOICE_OOHS' in globals() else CHOIR_AAHS
 
 # ---------- Parámetros ----------
-tempoBPM = 98.0                 # tempo medio (90–120 según lámina)
+tempoBPM = 98.0                 # tempo medio (90–120 según)
 measures = 16                   # A (8) + A' (8)  → ~39 s a 98 BPM
 score = Score("Adventure Loop", tempoBPM)
 
@@ -37,17 +43,15 @@ melody  = Part("Melody",  FLUTE,              ch_melody)
 horns   = Part("Horns",   FRENCH_HORN,        ch_horns)
 choir   = Part("Choir",   CHOIR,              ch_choir)
 
-# ---------- Progresión (C mayor) ----------
-# A : C  | Am | F  | G  | C  | F  | Dm | G
-# A’: C  | Am | F  | G  | C  | F  | Dm | Gsus4  (cadencia abierta para loop)
+
 C3, D3, E3, F3, G3, A3, B3 = 48, 50, 52, 53, 55, 57, 59
 C4, D4, E4, F4, G4, A4, B4 = 60, 62, 64, 65, 67, 69, 71
 C5, D5, E5, F5, G5        = 72, 74, 76, 77, 79
 
 PROG = [
-    ("Cadd9", [C3, G3, C4, E4, D4]),   # I(add9)
+    ("Cadd9", [C3, G3, C4, E4, D4]),   
     ("Am",    [A3, E4, A4, C4]),
-    ("Fadd9", [F3, C4, F4, A4, G4]),   # IV(add9)
+    ("Fadd9", [F3, C4, F4, A4, G4]),   
     ("G",     [G3, D4, G4, B4]),
     ("Cadd9", [C3, G3, C4, E4, D4]),
     ("Fadd9", [F3, C4, F4, A4, G4]),
@@ -60,30 +64,29 @@ PROG = [
     ("Cadd9", [C3, G3, C4, E4, D4]),
     ("Fadd9", [F3, C4, F4, A4, G4]),
     ("Dm7",   [D3, A3, D4, F4, C4]),
-    ("Gsus4", [G3, D4, G4, C4])        # Dominante suspendida → re-entra al inicio
+    ("Gsus4", [G3, D4, G4, C4])        
 ]
 
-# ---------- Utilidades ----------
+
 def add_strings_bar(chord_pitches, bar_idx, dyn=72):
     """Pad de cuerdas: acorde redonda (WN) en el compás bar_idx."""
     cp = CPhrase(bar_idx * WN)
     cp.addChord(chord_pitches, WN)
-    # ajustar dinámica por nota
     for p in chord_pitches:
-        pass  # CPhrase maneja dinámica global; luego suavizamos con Mod
+        pass  
     strings.addCPhrase(cp)
 
 def add_arp_bar(chord_pitches, bar_idx, dyn=66, triplet=False):
     """Arpegio 1 compás (movimiento sutil con leve síncopa)."""
     ph = Phrase(bar_idx * WN)
     pat_idx = [0, 1, 2, 3, 0, 1, 4 if len(chord_pitches) > 4 else 2, 1]
-    dur = EN if not triplet else (QN/3.0)  # corcheas o tresillos (sensación 6/8)
+    dur = EN if not triplet else (QN/3.0)  # (sensación 6/8)
     for i in range(8):
         idx = pat_idx[i] % len(chord_pitches)
         n = Note(chord_pitches[idx], dur)
         n.setDynamic(dyn)
         ph.addNote(n)
-    # Relleno si faltó/ sobró por redondeo
+    
     ph.setDuration(WN)
     arp.addPhrase(ph)
 
@@ -98,17 +101,17 @@ def phrase_from_pairs(pairs, start_bar, dyn=84):
 
 # ---------- Construcción ----------
 
-# 1) STRINGS: base armónica con leve crescendo en A'
+# 1) STRINGS
 for i, (_, chord) in enumerate(PROG):
     d = 70 if i < 8 else 78
     add_strings_bar(chord, i, dyn=d)
 
-# 2) ARPEGIO continuo (arpa; si no tienes HARP, cambia a PIANO arriba)
+# 2) ARPEGIO
 for i, (_, chord) in enumerate(PROG):
     d = 64 if i < 8 else 72
     add_arp_bar(chord, i, dyn=d, triplet=False)
 
-# 3) MELODÍA (flauta): motivo A (entra en compás 3) + variación A'
+# 3) MELODÍA 
 melA = [
     (G4, QN), (C5, QN), (B4, EN), (A4, EN), (G4, HN),
     (E4, QN), (G4, EN), (A4, EN), (G4, QN+EN), (E4, EN),
@@ -119,14 +122,14 @@ melA_var = [
     (G4, QN), (C5, QN), (B4, EN), (A4, EN), (G4, HN),
     (E4, QN), (G4, EN), (A4, EN), (G4, QN+EN), (E4, EN),
     (F4, HN), (E4, QN), (D4, QN),
-    (A4, QN), (G4, EN), (E4, EN), (D4, QN), (C4, QN)  # prepara Gsus4
+    (A4, QN), (G4, EN), (E4, EN), (D4, QN), (C4, QN)  
 ]
 melA_ph  = phrase_from_pairs(melA,     start_bar=2, dyn=84)   # compases 3–6 aprox.
 melA2_ph = phrase_from_pairs(melA_var, start_bar=10, dyn=90)  # compases 11–14
 melody.addPhrase(melA_ph)
 melody.addPhrase(melA2_ph)
 
-# 4) HORNS (sustain) — épica contenida en A'
+# 4) HORNS 
 for i in range(10, 14):  # compases 11–14
     root = PROG[i][1][0]
     ph = Phrase(i * WN)
@@ -134,20 +137,19 @@ for i in range(10, 14):  # compases 11–14
     ph.addNote(n)
     horns.addPhrase(ph)
 
-# 5) CHOIR (pads aire) — entradas sutiles
+# 5) CHOIR (
 for i in (8, 12, 15):  # compases 9, 13 y 16
     cp = CPhrase(i * WN)
     cp.addChord(PROG[i][1], WN)  # acorde entero
     choir.addCPhrase(cp)
 
-# ---------- Ensamble y salida ----------
+
 score.addPart(strings)
 score.addPart(arp)
 score.addPart(melody)
 score.addPart(horns)
 score.addPart(choir)
 
-# Reproduce y exporta
+# Reproducción
 Play.midi(score)
 Write.midi(score, "adventure_loop_major.mid")
-print("Listo: adventure_loop_major.mid (~39 s a 98 BPM). El final (Gsus4) re-entra suave al inicio.")
